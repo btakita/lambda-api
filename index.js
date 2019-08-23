@@ -237,11 +237,15 @@ console.debug('lambda-api|run|debug|4')
         })
 
       } // end for
-
+console.debug('lambda-api|run|debug|5')
     } catch(e) {
+      console.debug('lambda-api|run|debug|6', {
+        e,
+        response,
+      })
       await this.catchErrors(e,response)
     }
-
+console.debug('lambda-api|run|debug|7')
     // Return the final response
     return response._response
 
