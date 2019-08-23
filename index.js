@@ -220,15 +220,28 @@ class API {
 
       // Loop through the execution stack
       for (const fn of request._stack) {
+        console.debug('run|debug|1', {
+          fn,
+          'response._state': response._state,
+        })
         // Only run if in processing state
         if (response._state !== 'processing') break
 
         await new Promise(async r => {
           try {
             let rtn = await fn(request,response,() => { r() })
+        console.debug('run|debug|2', {
+          fn,
+          rtn,
+        })
             if (rtn) response.send(rtn)
             if (response._state === 'done') r() // if state is done, resolve promise
           } catch(e) {
+        console.debug('run|debug|3', {
+          fn,
+          e,
+          response,
+        })
             await this.catchErrors(e,response)
             r() // resolve the promise
           }
@@ -288,6 +301,9 @@ class API {
         // Promisify error middleware
         await new Promise(r => {
           let rtn = err(e,response._request,response,() => { r() })
+          console.debug('catchErrors|debug|1', {
+            rtn,
+          })
           if (rtn) response.send(rtn)
         })
       } // end for
@@ -345,13 +361,14 @@ class API {
 
     // Add func args as middleware
     for (let arg in args) {
-      if (typeof args[arg] === 'function') {
-        if (args[arg].length === 3) {
-          middleware.push(args[arg])
-        } else if (args[arg].length === 4) {
-          this._errors.push(args[arg])
+      const val = args[arg]
+      if (typeof val === 'function') {
+        if (val.length === 2 || val.length === 3) {
+          middleware.push(val)
+        } else if (val.length === 4) {
+          this._errors.push(val)
         } else {
-          throw new ConfigurationError('Middleware must have 3 or 4 parameters')
+          throw new ConfigurationError('Middleware must have 2, 3, or 4 parameters')
         }
       }
     }
