@@ -210,14 +210,16 @@ class API {
     this._cb = cb ? cb : undefined
 
     // Initalize request and response objects
+    console.debug('lambda-api|run|debug|1')
     let request = new REQUEST(this)
+    console.debug('lambda-api|run|debug|2')
     let response = new RESPONSE(this,request)
 
     try {
-
+console.debug('lambda-api|run|debug|3')
       // Parse the request
       await request.parseRequest()
-
+console.debug('lambda-api|run|debug|4')
       // Loop through the execution stack
       for (const fn of request._stack) {
         // Only run if in processing state
